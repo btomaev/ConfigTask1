@@ -1,5 +1,6 @@
-from typing import Literal
-from zipfile import ZipFile, Path
+from typing import Literal, List
+from zipfile import ZipFile, ZipInfo, Path
+from io import BytesIO
 
 def mount(path: str):
     global _FS
@@ -88,6 +89,11 @@ class FS:
                 path += "/"
             path = FS._normalize_path(path)
             return Path(fs, path)
+        
+    def get_info(self, path):
+        with ZipFile(self._fs_image_path, mode="r") as fs:
+            path = FS._normalize_path(path)
+            return fs.getinfo(path)
              
     def mkdir(self, path: str, mode: int=511, repair: bool=True):
         with ZipFile(self._fs_image_path, mode="a") as fs:
@@ -100,7 +106,19 @@ class FS:
         if repair:
             self.repair()
 
-    def open_file(self, path: str, mode: Literal["r", "w", "x", "a"]="r"):
+    def open_file(self, path: str | ZipInfo, mode: Literal["r", "w", "x", "a"]="r"):
         fs = ZipFile(self._fs_image_path, mode="a")
-        path = FS._normalize_path(path)
+        if not isinstance(path, ZipInfo):
+            path = FS._normalize_path(path)
         return fs.open(path, mode=mode, force_zip64=True)
+    
+    def delete(self, paths: List[str]):
+        paths = [FS._normalize_path(path) for path in paths]
+        tmp = BytesIO()
+        with ZipFile(self._fs_image_path, mode="r") as fs:
+            with ZipFile(tmp, mode="w") as new_fs:
+                for fileinfo in fs.filelist:
+                    if fileinfo.filename not in paths:
+                        new_fs.writestr(fileinfo, fs.read(fileinfo))
+        with open(self._fs_image_path, mode="wb") as file:
+            file.write(tmp.getvalue())
