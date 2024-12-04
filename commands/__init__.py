@@ -1,4 +1,3 @@
-from importlib.util import module_from_spec
 import pkgutil, sys
 
 _all_commands = {}
@@ -33,7 +32,7 @@ def get_commands():
             else:
                 m = importer.find_spec(fullname).loader.load_module(fullname)
         except:
-            raise CommandLoadError(f"Failed to load module '{modname.lower()}'")
+            raise CommandLoadError(f"Failed to load command '{modname.lower()}'")
         if not check_function_exists_and_callable(m, "run") and check_object_exists(m, "CLI_NAME"):
             continue
         _all_commands[m.CLI_NAME.lower()] = m

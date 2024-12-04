@@ -22,6 +22,7 @@ def run(cmd):
             print(f"{"mode":<10}  {"name":<{max_name_len}}  {"modified":>19}  {"size":>10}")
             for path, file in dir_content:
                 hi = file.external_attr >> 16
+                print(hi)
                 print(f"{filemode(hi):<10}  {path.name + "/" if path.is_dir() else path.name:<{max_name_len}}  {datetime(*file.date_time).strftime("%d/%m/%Y %H:%M:%S"):>19}  {file.file_size:>10}")
         else:
             for path, file in dir_content:
