@@ -41,7 +41,7 @@ class FS:
     def is_file(self, path: str):
        with ZipFile(self._fs_image_path, mode="r") as fs:
             if path == "/":
-                return True
+                return False
             path_obj = Path(fs, FS._normalize_path(path))
             return path_obj.exists() and path_obj.is_file()
         
@@ -106,11 +106,22 @@ class FS:
         if repair:
             self.repair()
 
-    def open_file(self, path: str | ZipInfo, mode: Literal["r", "w", "x", "a"]="r"):
-        fs = ZipFile(self._fs_image_path, mode="a")
-        if not isinstance(path, ZipInfo):
-            path = FS._normalize_path(path)
-        return fs.open(path, mode=mode, force_zip64=True)
+    def open_file(self, path: str | ZipInfo, mode: Literal["r", "w"]="r"):
+        class FileDescriptor(object):
+            def __init__(self, zip_path, file_path):
+                self.zip_path = zip_path
+                self.file_path = file_path
+            def __enter__(self):
+                self.fs = ZipFile(self.zip_path, mode="a")
+                if not isinstance(self.file_path, ZipInfo):
+                    self.file_path = FS._normalize_path(self.file_path)
+                self.file = self.fs.open(self.file_path, mode=mode, force_zip64=True)
+                return self.file
+            def __exit__(self, type, value, traceback):
+                self.file.close()
+                self.fs.close()
+
+        return FileDescriptor(self._fs_image_path, path)
     
     def delete(self, paths: List[str]):
         paths = [FS._normalize_path(path) for path in paths]

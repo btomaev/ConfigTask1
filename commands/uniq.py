@@ -18,7 +18,7 @@ def run(cmd):
         print(help_str)
         return
     
-    path = fs.cwd + pos[1] if pos[1].startswith("/") else pos[1]
+    path = pos[1] if pos[1].startswith("/") else fs.cwd + pos[1]
     if not fs.is_file(path):
         print(f"{pos[1]} is not a file.")
         return

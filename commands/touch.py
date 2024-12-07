@@ -1,4 +1,4 @@
-from fs import get_fs, ZipInfo
+from fs import get_fs, ZipInfo, FS
 from parser import parse_args
 from datetime import datetime
 
@@ -11,12 +11,13 @@ def run(cmd):
     help_str =  "Usage: touch [-c] [-d DATE] [-t DATE] [-r FILE] FILE..." +"\n\n" + \
                 "Update the last-modified date on the given FILE[s]" +"\n\n" + \
                 "    -h  --help     Show help message" +"\n" + \
-                "    -c             Don't create files" +"\n" + \
-                "    --ref FILE     Use FILE's date/time"
+                "    -c             Don't create files" +"\n"
     
     if "-h" in opts or "--help" in opts or len(pos) == 1:
         print(help_str)
         return
+    
+    dt = datetime.now().timetuple()
 
     for filename in pos[1:]:
         filename = pos[1] if pos[1].startswith("/") else fs.cwd + pos[1]
@@ -25,17 +26,16 @@ def run(cmd):
                 with fs.open_file(filename, "r") as file:
                     content = file.read()
                     fileinfo = fs.get_info(filename)
-                    fileinfo.date_time = datetime.now().timetuple()
+                    fileinfo.date_time = dt
                 fs.delete([filename])
                 with fs.open_file(fileinfo, "w") as new_flie:
                     new_flie.write(content)
             else:
                 print(f"{pos[1]} is not a file.")
         else:
+            filename = FS._normalize_path(filename)
             mode = int("100644", base=8)
-            fileinfo = ZipInfo(filename, datetime.now().timetuple())
-            print(fileinfo.external_attr)
+            fileinfo = ZipInfo(filename, dt)
             fileinfo.external_attr = ((0x1000000000 | mode) & 0xFFFF) << 16
-            print(fileinfo)
-            file = fs.open_file(filename, "w")
-            file.close()
+            with fs.open_file(fileinfo, "w") as file:
+                pass

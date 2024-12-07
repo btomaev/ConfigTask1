@@ -10,9 +10,13 @@ def run(cmd):
     fs = get_fs()
 
     if len(pos) > 1:
-        path = fs.cwd + pos[1] if pos[1].startswith("/") else pos[1]
+        path = pos[1] if pos[1].startswith("/") else fs.cwd + pos[1]
     else:
         path = fs.cwd
+
+    if not fs.is_dir(path):
+        print(f"{path} is not a directory")
+        return
 
     dir_content = fs.list_dir(path)
 
@@ -22,7 +26,6 @@ def run(cmd):
             print(f"{"mode":<10}  {"name":<{max_name_len}}  {"modified":>19}  {"size":>10}")
             for path, file in dir_content:
                 hi = file.external_attr >> 16
-                print(hi)
                 print(f"{filemode(hi):<10}  {path.name + "/" if path.is_dir() else path.name:<{max_name_len}}  {datetime(*file.date_time).strftime("%d/%m/%Y %H:%M:%S"):>19}  {file.file_size:>10}")
         else:
             for path, file in dir_content:
