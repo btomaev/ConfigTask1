@@ -12,7 +12,7 @@ def run(cmd):
                 "    -h  --help     Show help message" +"\n" + \
                 "    -d             Only print duplicate lines" +"\n" + \
                 "    -u             Only print unique lines" +"\n" + \
-                "    -i             Ignore case"
+                "    -i             Ignore case\n"
     
     if "-h" in opts or "--help" in opts or len(pos) == 1:
         print(help_str)
