@@ -42,6 +42,9 @@ python shell.py fs_root.zip --user alice --log session_log.csv --startup startup
 python shell.py fs_root.zip
 ```
 
+### Пример работы
+[пример работы](https://github.com/btomaev/ShellEmu/blob/main/images/work.png?raw=true)
+
 ## Результаты работы
 - Лог-файл в формате CSV, содержащий все действия пользователя.
 - Автоматическое выполнение команд из стартового скрипта, если он указан.
@@ -57,3 +60,5 @@ python shell.py fs_root.zip
 ```bash
 pytest tests/
 ```
+### Результаты тестов
+[результаты тестов](https://github.com/btomaev/ShellEmu/blob/main/images/tests.png?raw=true)
