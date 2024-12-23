@@ -61,4 +61,4 @@ python shell.py fs_root.zip
 pytest tests/
 ```
 ### Результаты тестов
-![результаты тестов](https://github.com/btomaev/ShellEmu/blob/main/images/tests.png?raw=true)
+![результаты тестирования](https://github.com/btomaev/ShellEmu/blob/main/images/tests.png?raw=true)
